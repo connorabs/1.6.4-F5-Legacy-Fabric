@@ -33,46 +33,9 @@ this mappings build, not a hardcoded key code.
 ./gradlew build
 ```
 
-Output jar lands in `build/libs/`.
+Output jar lands in `build/libs/`
 
-## How class/method names were determined
-
-Early drafts of this mod were written against *plausible* 1.6.4 class/method names based on
-general Minecraft-modding convention, and that turned out wrong in several places — 1.6.4's
-Legacy Yarn mappings actually use **modern yarn-style names** (`MinecraftClient`, not
-`Minecraft`; `ClientPlayerEntity`, not `EntityClientPlayerMP`; `GameOptions`, not
-`GameSettings`), and some members have no human-readable mapping at all yet (fields fall back to
-a raw intermediary name like `field_3805`).
-
-Every name actually used in this final version was **verified directly against this project's
-real tiny-format mappings file** (`net.legacyfabric:yarn:1.6.4+build.604`, tiny v2, `named` /
-`official` / `intermediary` columns) rather than guessed - both the class/method names
-themselves, and (where it mattered) whether a field was public or had a real public accessor,
-by cross-checking against yarn's field-visibility history across other Minecraft versions.
-
-Two members turned out to have no safe way to access directly:
-
-- `MinecraftClient`'s local-player field has no named mapping (`field_3805` only), so its real
-  Java visibility can't be determined from the mappings file alone.
-- `KeyBinding`'s `code`/`pressed` fields are confirmed **private** in every yarn mappings
-  generation checked (this isn't 1.6.4-specific - it's been private since the earliest versions
-  with named mappings at all).
-
-For the first, `MinecraftClientAccessor.java` is a Mixin `@Accessor` interface that exposes
-`field_3805` (the player) and `currentScreen` regardless of their actual visibility - this is
-the standard, idiomatic Fabric technique for exactly this situation, and sidesteps needing to
-know or guess the modifier. For the second, keybinding down-state is read through the real
-public API instead: `GameOptions.isPressed(KeyBinding)` (a static method *on* `GameOptions`,
-confirmed via the mappings file - not an instance method on `KeyBinding` itself, which was an
-easy wrong turn to take).
-
-**If you regenerate mappings later and something renames:** re-run the same lookup against the
-new tiny file - `grep -P "^c\t" file.tiny` lists every class as `named  official  intermediary`,
-and `awk` scoped between a class's `^c\t` line and the next one lists that class's fields/methods
-the same way. `./gradlew genSources` plus an IDE also works if you'd rather browse decompiled
-source directly.
-
-## Notes on design
+## Notes on design (AI SAYING WUT AI DID WRONG JFL)
 
 - No config-screen (Mod Menu / Cloth Config) integration is wired up — settings live in
   `config/omnilook-lite.properties`, editable by hand. Wiring up Legacy Mod Menu is a
