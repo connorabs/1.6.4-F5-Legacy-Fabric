@@ -28,9 +28,9 @@ this mappings build, not a hardcoded key code.
   keybinding module, so Fabric Loader alone is enough.
 
 ## Building
-
+in CMD Prompt enter
 ```
-./gradlew build
+gradlew.bat build
 ```
 
 Output jar lands in `build/libs/`
