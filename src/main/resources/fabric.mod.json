@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "omnilook-lite",
+  "version": "${version}",
+  "name": "omnilook",
+  "description": "A minimal freelook mod for 1.6.4 with two keybindable modes: no yaw f5 and yaw f5 (yaw being camera rotation)",
+  "authors": [
+    "connorabs"
+  ],
+  "contact": {
+    "homepage": "https://github.com/connorabs/1.6.4-F5-Legacy-Fabric/"
+  },
+  "license": "Unlicense",
+  "icon": "assets/omnilook-lite/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.example.omnilook.OmnilookLiteClient"
+    ]
+  },
+  "mixins": [
+    "omnilook-lite.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "1.6.4"
+  }
+}

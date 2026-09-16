@@ -1,0 +1,95 @@
+plugins {
+    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'legacy-looming' version '1.6-SNAPSHOT'
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+base {
+    archivesName = project.archives_base_name
+}
+
+repositories {
+    maven {
+        name = "legacy-fabric"
+        url = "https://repo.legacyfabric.net/legacyfabric/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+    // legacy.yarn(...) is a helper provided by the legacy-looming plugin
+    // that resolves the correct mappings artifact/group for the given MC
+    // version - this avoids hand-guessing whether it's net.fabricmc: or
+    // net.legacyfabric: yarn for a given version, which has changed over
+    // the project's history and is easy to get wrong (I got it wrong
+    // myself while putting this file together - see the note at the
+    // bottom of this file for the full story if you're curious).
+    // IMPORTANT: takes the bare build NUMBER as the second argument
+    // (e.g. 604), not the full "1.6.4+build.604" version string - the
+    // helper builds that full string itself. Passing the full string
+    // here (a mistake I made in an earlier pass of this file) produces
+    // a garbled double-prefixed version and fails to resolve.
+    mappings legacy.yarn(project.minecraft_version, project.yarn_build)
+
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // No Legacy Fabric API dependency: this mod only needs Fabric Loader's
+    // ClientModInitializer entrypoint and Mixin, both of which come from
+    // the loader itself. Keybindings are registered by hand against
+    // vanilla's GameSettings.keyBindings array (see OmnilookLiteClient)
+    // instead of a Fabric API keybinding module, specifically to avoid
+    // depending on a Legacy Fabric API submodule version - those have
+    // proven unreliable to pin down correctly for 1.6.4 (see README).
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+}
+
+java {
+    withSourcesJar()
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archives_base_name}" }
+    }
+}
+
+// ------------------------------------------------------------------
+// NOTE on the version-lookup process for this file:
+// I could not find one single authoritative, always-current source for
+// exact current build numbers for this toolchain, and the raw Maven
+// coordinates have genuinely changed group IDs across its history
+// (net.legacyfabric vs net.fabricmc for the same artifacts, depending
+// on era) - I got this wrong more than once while putting this together.
+// Using legacy.yarn(...) above sidesteps needing to get the group ID
+// right by hand for mappings. This mod deliberately has no Legacy
+// Fabric API dependency at all (see the comment in the dependencies
+// block) specifically because pinning an exact, correct Legacy Fabric
+// API submodule version for 1.6.4 proved unreliable to do by hand.
+// Still worth double-checking before building:
+//   - yarn_build number in gradle.properties - check
+//     https://meta.legacyfabric.net/v2/versions/yarn/1.6.4 (JSON, open
+//     directly in a browser) for the current highest "build" number.
+//     This is a bare number (604), not the full "1.6.4+build.604" string.
+//   - loader_version - shared with modern Fabric Loader releases, check
+//     https://meta.legacyfabric.net/v2/versions/loader (JSON) for the
+//     current stable version.
+// ------------------------------------------------------------------
