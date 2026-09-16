@@ -35,15 +35,11 @@ this mappings build, not a hardcoded key code.
 
 Output jar lands in `build/libs/`
 
-## Notes on design (AI SAYING WUT AI DID WRONG JFL)
+## Notes on design 
 
 - No config-screen (Mod Menu / Cloth Config) integration is wired up — settings live in
   `config/omnilook-lite.properties`, editable by hand. Wiring up Legacy Mod Menu is a
   reasonable follow-up if you want a GUI.
-- Camera Freelook mode reads raw LWJGL mouse deltas directly (rather than relying on
-  vanilla's mouse handling) so it can apply them purely to the camera without any risk of
-  them leaking into entity rotation. `MixinEntity` also blocks `Entity#setRotation` while this
-  mode is active as a second layer of protection.
 - Yaw-Follow mode switches `GameOptions.perspective` to third-person-behind (`1`) on activation
   (the same field vanilla's own F5 key drives, verified via the tiny mappings file) and restores
   whatever perspective you were in before once you release/toggle off the key. It continuously
