@@ -2,9 +2,6 @@
 
 A minimal, single-version freelook mod inspired by [Omnilook](https://github.com/rhysdh540/Omnilook),
 built for Minecraft 1.6.4 on Legacy Fabric. This is **not** the real Omnilook mod/source -
-it's a from-scratch implementation covering the behaviour you asked for, since Omnilook's
-own source isn't distributed in a way I could pull down and repackage.
-
 ## What it does
 
 Two independent, keybindable modes (only one active at a time):
